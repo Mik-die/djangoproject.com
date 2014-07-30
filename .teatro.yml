@@ -1,0 +1,19 @@
+config:
+  services: 
+    - postgresql
+
+stage:
+  before:
+    - cp secrets.teatro.json ../secrets.json
+    - pip install -r deploy-requirements.txt
+    - pip install -r local-requirements.txt
+
+  database:
+    - createuser -Upostgres -d djangoproject
+    - createdb -Upostgres -O djangoproject djangoproject
+    - createuser -Upostgres code.djangoproject
+    - createdb -Upostgres -O code.djangoproject code.djangoproject
+
+    - psql -Upostgres -d code.djangoproject < tracdb/trac.sql
+    - python manage.py syncdb
+    - python manage.py migrate
